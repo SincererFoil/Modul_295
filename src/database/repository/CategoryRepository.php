@@ -19,20 +19,24 @@ class CategoryRepository {
     }
 
     public function getCategoryById(int $id): array {
-        $stmt = $this->connection->prepare("SELECT * FROM category WHERE id = ?");
+        $stmt = $this->connection->prepare("SELECT * FROM category WHERE category_id = ?");
         $stmt->execute([$id]);
         $result = $stmt->get_result();
         return $result->fetch_all(MYSQLI_ASSOC);
     }
 
-    public function updateCategory(int $id, string $name, bool $active): void {
-        $stmt = $this->connection->prepare("UPDATE category SET active = ?, name = ? WHERE id = ?");
+    public function updateCategory(int $id, string $name, int $active): array {
+
+
+        $stmt = $this->connection->prepare("UPDATE category SET active = ?, name = ? WHERE category_id = ?");
         $stmt->execute([$active, $name, $id]);
+
+        return ["id" => $id, "name" => $name, "active" => $active];
 
     }
 
     public function existsById(int $id): bool {
-        $stmt = $this->connection->prepare("SELECT * FROM category WHERE id = ?");
+        $stmt = $this->connection->prepare("SELECT * FROM category WHERE category_id = ?");
         $stmt->execute([$id]);
         $result = $stmt->get_result();
         // Returns a boolean (if the result is not empty)
@@ -46,7 +50,7 @@ class CategoryRepository {
         return !empty($result->fetch_all(MYSQLI_ASSOC));
     }
 
-    public function createCategory(bool $active, string $name): Category {
+    public function createCategory(int $active, string $name): Category {
         $stmt = $this->connection->prepare("INSERT INTO category (active, name) VALUES (?, ?)");
         $stmt->execute([$active, $name]);
         $id = $this->connection->insert_id;
@@ -54,7 +58,7 @@ class CategoryRepository {
     }
 
     public function deleteCategory(int $id): bool {
-        $stmt = $this->connection->prepare("DELETE FROM category WHERE id = ?");
+        $stmt = $this->connection->prepare("DELETE FROM category WHERE category_id = ?");
         $stmt->execute([$id]);
         return $stmt->affected_rows > 0;
     }

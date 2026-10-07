@@ -4,6 +4,7 @@ namespace App\controller;
 use App\service\CategoryService;
 use App\service\JwtService;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 class CategoryController {
@@ -14,19 +15,39 @@ class CategoryController {
         $this->categoryService = $categoryService;
     }
 
-    public function createCategory($request, $response, $args): ResponseInterface {
+
+    /**
+     * Creates a new Category from the request data
+     *
+     * Possible response codes:
+     * 201 Created -> Successful creation
+     * 400 Bad Request -> for invalid inputs
+     * 500 Internal Server Error -> for server issues
+     *
+     * @param ServerRequestInterface $request The incomming HTTP request.
+     * @param ResponseInterface $response The Response Object
+     * @param array $args The route argumments provided
+     * @return ResponseInterface The json result containing the result.
+     *
+     */
+    public function createCategory(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface {
+        // Executes the createCategory in CategoryService and saves the service response in $result
         $result = $this->categoryService->createCategory($request);
 
+        // Checks if the response array contains an Error
         if (isset($result["error"])) {
             $code = 400;
+            // Checks if the response array has a fatal unexpected error
         } elseif (isset($result["fatal error"])) {
             $code = 500;
         } else {
+            // Sets the normal "Created" code
             $code = 201;
         }
-
+        // Array into a JSON response object
         $response->getBody()->write(json_encode($result, true));
         $response = $response->withStatus($code)->withHeader('Content-Type', 'application/json');
+        // Returns the response to the client
         return $response;
 
     }
@@ -35,37 +56,68 @@ class CategoryController {
     /**
      *  This method returns all Categories from the Database
      *
-     * @param RequestHandlerInterface $request Users request to the endpoint
+     * Possible response codes:
+     * 200 OK -> Successful Response
+     * 500 Internal Server Error -> for server issues
+ *
+     * @param ServerRequestInterface  $request Users request to the endpoint
      * @param ResponseInterface $response  The given response for the user by the endpoint
      * @param array $args possible Path variables in a assiociative array
      * @return ResponseInterface Returns the Response to the user
      */
-    public function getCategoriesRequest(RequestHandlerInterface $request, ResponseInterface $response, array $args): ResponseInterface {
+    public function getCategoriesRequest(ServerRequestInterface  $request, ResponseInterface $response, array $args): ResponseInterface {
 
         // Calls the getAllCategories method from the Category Repository
         // and saves the response in the variable $categories
-        $categories = $this->categoryService->getAllCategories();
+        $result = $this->categoryService->getAllCategories();
 
+        // Sets the Status to 200 = OK
+        $code = 200;
         // Checks if the response has a fatal error
-        if (isset($categories["fatal error"])) {
-            $response->getBody()->write(json_encode($categories));
+        if (isset($result["fatal error"])) {
             // Sets the Status to 500 = Internal Server Error
-            $response = $response->withStatus(500)->withHeader('Content-Type', 'application/json');
-            // Returns the Error Response
-            return $response;
+            $code = 500;
         }
 
         // Writes the given response as a json into the response body
-        $response->getBody()->write(json_encode($categories));
-        // Sets the Status to 200 = OK
-        $response = $response->withStatus(200)->withHeader('Content-Type', 'application/json');
+        $response->getBody()->write(json_encode($result));
+        $response = $response->withStatus($code)->withHeader('Content-Type', 'application/json');
         // Returns the Result Response
         return $response;
     }
 
-//    public function updateCategory($request, $response, $args): ResponseInterface {
-//        $this->categoryService
-//    }
+
+    /**
+     *  Updates an existing Category from the provided data
+     *
+     * @param ServerRequestInterface $request The incomming request
+     * @param ResponseInterface $response The HTTP response object
+     * @param array $args Route argumments provided
+     * @return ResponseInterface The JSON response containing the result
+     */
+    public function updateCategory(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface {
+
+        $result = $this->categoryService->updateCategory($request, $args);
+
+        // Sets the Status to 200 = OK
+        $code = 200;
+
+        if (isset($result["error"])) {
+            // Sets the Status code to 400 = Bad Request
+            $code = 400;
+        }
+
+        if (isset($result["fatal error"])) {
+            // Sets the status code to 500 = Internal Server Error
+            $code = 500;
+        }
+
+        // Converts the array into a JSON array
+        $response->getBody()->write(json_encode($result, true));
+        // Sets content-type and status code
+        $response = $response->withStatus($code)->withHeader('Content-Type', 'application/json');
+        return $response;
+    }
 
 
 

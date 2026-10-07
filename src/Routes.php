@@ -36,20 +36,23 @@ class Routes {
         // Auth Routes
 
         // (Authenticate) Route
-        $app->post('authenticate', [$authController, 'authenticate']);
+        $app->post('/authenticate', [$authController, 'authenticate']);
 
         // (UnAuthenticate) Route
-        $app->delete('unauthenticate', [$authController, 'unAuthenticate']);
+        $app->delete('/unauthenticate', [$authController, 'unAuthenticate']);
 
 
         // Category Routes
 
         // GET (Categories) Route
-        $app->get("categories", [$categoryController, 'getCategoriesRequest'])
+        $app->get("/categories", [$categoryController, 'getCategoriesRequest'])
         ->addMiddleware($middleware);
 
         // POST (Category) Route
-        $app->post('category', [$categoryController, 'createCategory'])
+        $app->post('/category', [$categoryController, 'createCategory'])
         ->addMiddleware($middleware);
+
+        // PATCH (Category) Route
+        $app->patch('/category/{category_id}', [$categoryController, 'updateCategory']);
     }
 }
