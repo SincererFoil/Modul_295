@@ -2,6 +2,7 @@
 
 namespace App\database;
 use mysqli;
+use mysqli_sql_exception;
 
 class Database
 {
@@ -10,7 +11,15 @@ class Database
 
     public function __construct()
     {
-        $this->connection = new mysqli("localhost", "root", "", "uek295", "3306");
+        try {
+            $this->connection = new mysqli("mysql", "root", "", "uek295", "3306");
+            if ($this->connection->connect_error) {
+                throw new mysqli_sql_exception("Couldn't connect to database with exception: " . $this->connection->connect_error);
+            }
+        } catch (mysqli_sql_exception $exception) {
+            throw new mysqli_sql_exception("Couldn't connect to database with exception: " . $exception->getMessage());
+        }
+
     }
 
     public function getConnection(): mysqli {
