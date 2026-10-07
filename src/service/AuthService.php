@@ -4,12 +4,12 @@ namespace App\service;
 
 use App\exception\JwtSecretNotFound;
 
-class AuthenticationService {
+class AuthService {
 
     private JwtService $jwtService;
 
     private string $username = "admin";
-    private string $password = "admin";
+    private string $password = "sec!ReT423*&";
 
     public function __construct(JwtService $jwtService) {
         $this->jwtService = $jwtService;

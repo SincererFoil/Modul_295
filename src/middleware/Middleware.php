@@ -22,14 +22,9 @@ class Middleware implements \Psr\Http\Server\MiddlewareInterface
 
 
     public function process(ServerRequestInterface $request,  RequestHandlerInterface  $handler): ResponseInterface   {
-        $authorization = $request->getHeader('Authorization');
+        $token = $_COOKIE["token"] ?? null;
 
-        if (empty($authorization) || !str_starts_with($authorization[0], "Bearer ")) {
-           return $this->sendUnauthorized(new Response(), "No authorization header");
-        }
-
-        $token = substr($authorization[0], 7);
-        if (empty($token)) {
+        if ($token == null) {
             return $this->sendUnauthorized(new Response(), "Missing token");
         }
 

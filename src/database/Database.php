@@ -9,21 +9,19 @@ class Database
     private mysqli $connection;
 
 
-    public function __construct()
-    {
+    public function __construct() {
         try {
-            $this->connection = new mysqli("mysql", "root", "", "uek295", "3306");
+            $this->connection = new mysqli(getenv("DB_HOST"), getenv("DB_USERNAME"), getenv("DB_PASSWORD"), getenv("DB_DATABASE"), getenv("DB_PORT"));
             if ($this->connection->connect_error) {
-                throw new mysqli_sql_exception("Couldn't connect to database with exception: " . $this->connection->connect_error);
+                throw new mysqli_sql_exception("Couldn't connect to database");
             }
         } catch (mysqli_sql_exception $exception) {
-            throw new mysqli_sql_exception("Couldn't connect to database with exception: " . $exception->getMessage());
+            throw new mysqli_sql_exception("Couldn't connect to database");
         }
 
     }
 
     public function getConnection(): mysqli {
         return $this->connection;
-
     }
 }
