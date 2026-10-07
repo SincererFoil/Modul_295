@@ -22,7 +22,7 @@ class CategoryRepository {
         $stmt = $this->connection->prepare("SELECT * FROM category WHERE category_id = ?");
         $stmt->execute([$id]);
         $result = $stmt->get_result();
-        return $result->fetch_all(MYSQLI_ASSOC);
+        return $result->fetch_assoc();
     }
 
     public function updateCategory(int $id, string $name, int $active): array {
@@ -33,6 +33,13 @@ class CategoryRepository {
 
         return ["id" => $id, "name" => $name, "active" => $active];
 
+    }
+
+    public function existsByNameExceptId(string $name, int $id): bool {
+        $stmt = $this->connection->prepare("SELECT category_id FROM category WHERE name = ? AND category_id != ?");
+        $stmt->execute([$name, $id]);
+
+        return $stmt->get_result()->num_rows > 0;
     }
 
     public function existsById(int $id): bool {

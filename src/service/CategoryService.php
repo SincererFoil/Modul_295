@@ -2,9 +2,7 @@
 namespace App\service;
 
 use App\database\repository\CategoryRepository;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
 
 class CategoryService {
 
@@ -31,7 +29,7 @@ class CategoryService {
             return ["error" => "Missing required parameter 'active' or 'name'"];
         }
 
-        // Checks if active is a boolean and if the name is a string
+        // Checks if active is a int and if the name is a string
         if (!is_int($array['active']) || !is_string($array['name'])) {
             return ["error" => "Wrong parameter type 'active' or 'name'"];
         }
@@ -101,8 +99,7 @@ class CategoryService {
             return ["error" => "Wrong parameter type 'id' or 'name' or 'active'"];
         }
 
-        // Converts the $id from the PathVariable to a string
-        // This is Important because Slim could return a string instead of an int.
+        // Converts the category_id path parameter from a string to an integer
         $id = (int) $id;
 
         // Checks if active is in between 0 - 1
@@ -110,17 +107,20 @@ class CategoryService {
             return ["error" => "Invalid value, active must be 0 or 1"];
         }
 
-        // Checks if the category exists by id
-        if (!$this->categoryRepository->existsById($id)) {
-            return ["error" => "Category does not exist"];
-        }
-
-        // Checks if the category exists by name
-        if ($this->categoryRepository->existsByName($name)) {
-            return ["error" => "Category name already exists"];
+        if (strlen($name) > 500) {
+            return ["error" => "Category name is too long"];
         }
 
         try {
+            // Checks if the category exists by id
+            if (!$this->categoryRepository->existsById($id)) {
+                return ["error" => "Category does not exist"];
+            }
+
+            // Checks if the category exists by name
+            if ($this->categoryRepository->existsByNameExceptId($name, $id)) {
+                return ["error" => "Category name already exists"];
+            }
             // Executes the update
             $result = $this->categoryRepository->updateCategory($id, $name, $active);
         } catch (\Throwable $exception) {
@@ -128,6 +128,78 @@ class CategoryService {
         }
         // Returns the final result
         return $result;
+    }
+
+
+    /**
+     *  Gets a specific category from the Database
+     *
+     * @param array $args The argumments given by the path-variable {category_id}))
+     * @return array Returns the final result in a array
+     */
+    public function getCategory(array $args): array {
+        // Checks if the "category_id" value is set else null
+        $id = $args['category_id'] ?? null;
+        // Checks if the $id is set
+        if (!isset($id)) {
+            return ["error" => "Missing required parameter 'category_id'"];
+        }
+
+        // Checks if the $id is a number
+        if (!is_numeric($id)) {
+            return ["error" => "Wrong parameter type 'category_id'"];
+        }
+
+        // Converts the category_id path parameter from a string to an integer
+        $id = (int) $id;
+
+        try {
+            // Checks if a Category with the id exists
+            if (!$this->categoryRepository->existsById($id)) {
+                return ["error" => "Category does not exist"];
+            }
+            // Returns the Category
+            return $this->categoryRepository->getCategoryById($id);
+        } catch (\Throwable $exception) {
+            // In case of an error it throws a 500 - internal server error
+            return ["fatal error" => "an unexpected error occurred"];
+        }
+    }
+
+
+    /**
+     *  Deletes a specific category from the Database
+     *
+     * @param array $args The argumments given by the path-variable {category_id}))
+     * @return array|null Returns the errors in a array or null for a successful deletion
+     */
+    public function deleteCategory(array $args): array|null {
+        // Checks if the "category_id" value is set else null
+        $id = $args['category_id'] ?? null;
+        // Checks if the $id is set
+        if (!isset($id)) {
+            return ["error" => "Missing required parameter 'category_id'"];
+        }
+
+        // Checks if the $id is a number
+        if (!is_numeric($id)) {
+            return ["error" => "Wrong parameter type 'category_id'"];
+        }
+
+        // Converts the category_id path parameter from a string to an integer
+        $id = (int) $id;
+
+        try {
+            // Checks if a Category with the id exists
+            if (!$this->categoryRepository->existsById($id)) {
+                return ["error" => "Category does not exist"];
+            }
+            $this->categoryRepository->deleteCategory($id);
+            return null;
+        } catch (\Throwable $exception) {
+            // In case of an error it throws a 500 - internal server error
+            return ["fatal error" => "an unexpected error occurred"];
+        }
     }
 
 

@@ -2,10 +2,9 @@
 
 namespace App\controller;
 use App\service\CategoryService;
-use App\service\JwtService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
+use OpenApi\Attributes as OAT;
 
 class CategoryController {
 
@@ -65,6 +64,8 @@ class CategoryController {
      * @param array $args possible Path variables in a assiociative array
      * @return ResponseInterface Returns the Response to the user
      */
+
+
     public function getCategoriesRequest(ServerRequestInterface  $request, ResponseInterface $response, array $args): ResponseInterface {
 
         // Calls the getAllCategories method from the Category Repository
@@ -89,6 +90,11 @@ class CategoryController {
 
     /**
      *  Updates an existing Category from the provided data
+     *
+     * Possible response codes:
+     * 200 OK -> Successful Update
+     * 400 Bad Request -> for invalid inputs
+     * 500 Internal Server Error -> for server issues
      *
      * @param ServerRequestInterface $request The incomming request
      * @param ResponseInterface $response The HTTP response object
@@ -119,6 +125,85 @@ class CategoryController {
         return $response;
     }
 
+    /**
+     *  Gets an existing Category from the provided data
+     *
+     * Possible response codes:
+     * 200 OK -> Successful response
+     * 400 Bad Request -> for invalid inputs
+     * 500 Internal Server Error -> for server issues
+     *
+     * @param ServerRequestInterface $request The incomming request
+     * @param ResponseInterface $response The HTTP response object
+     * @param array $args Route argumments provided
+     * @return ResponseInterface The JSON response containing the result
+     */
+    public function getCategory(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface {
+        $result = $this->categoryService->getCategory($args);
+
+        // Sets the Status to 200 = OK
+        $code = 200;
+
+        if (isset($result["error"])) {
+            // Sets the Status code to 400 = Bad Request
+            $code = 400;
+        }
+
+        if (isset($result["fatal error"])) {
+            // Sets the status code to 500 = Internal Server Error
+            $code = 500;
+        }
+
+        // Converts the array into a JSON array
+        $response->getBody()->write(json_encode($result, true));
+        // Sets content-type and status code
+        $response = $response->withStatus($code)->withHeader('Content-Type', 'application/json');
+        return $response;
+    }
+
+
+    /**
+     *  Deletes an existing Category from the provided data
+     *
+     * Possible response codes:
+     * 204 No Content -> Successful deletion with no response body
+     * 400 Bad Request -> for invalid inputs
+     * 500 Internal Server Error -> for server issues
+     *
+     * @param ServerRequestInterface $request The incomming request
+     * @param ResponseInterface $response The HTTP response object
+     * @param array $args Route argumments provided
+     * @return ResponseInterface The JSON response containing the errors
+     */
+    public function deleteCategory(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface {
+        $result = $this->categoryService->deleteCategory($args);
+
+        // Sets the Status to 204 = No Content
+        $code = 204;
+        $exception = false;
+
+        if (isset($result["error"])) {
+            // Sets the Status code to 400 = Bad Request
+            $code = 400;
+            $exception = true;
+        }
+
+        if (isset($result["fatal error"])) {
+            // Sets the status code to 500 = Internal Server Error
+            $code = 500;
+            $exception = true;
+        }
+
+        if ($exception) {
+            // Converts the array into JSON if an error was thrown
+            $response->getBody()->write(json_encode($result));
+            $response = $response->withHeader('Content-Type', 'application/json');
+        }
+
+        // Sets content-type and status code
+        $response = $response->withStatus($code);
+        return $response;
+    }
 
 
 }
