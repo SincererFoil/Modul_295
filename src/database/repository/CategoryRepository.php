@@ -12,14 +12,14 @@ class CategoryRepository {
     }
 
     public function getAllCategories(): array {
-        $stmt = $this->connection->prepare("SELECT * FROM category");
+        $stmt = $this->connection->prepare("SELECT category_id AS id, name, active FROM category");
         $stmt->execute();
         $result = $stmt->get_result();
         return $result->fetch_all(MYSQLI_ASSOC);
     }
 
     public function getCategoryById(int $id): array {
-        $stmt = $this->connection->prepare("SELECT * FROM category WHERE category_id = ?");
+        $stmt = $this->connection->prepare("SELECT category_id AS id, name, active FROM category WHERE category_id = ?");
         $stmt->execute([$id]);
         $result = $stmt->get_result();
         return $result->fetch_assoc();
@@ -36,7 +36,7 @@ class CategoryRepository {
     }
 
     public function existsByNameExceptId(string $name, int $id): bool {
-        $stmt = $this->connection->prepare("SELECT category_id FROM category WHERE name = ? AND category_id != ?");
+        $stmt = $this->connection->prepare("SELECT category_id AS id FROM category WHERE name = ? AND category_id != ?");
         $stmt->execute([$name, $id]);
 
         return $stmt->get_result()->num_rows > 0;

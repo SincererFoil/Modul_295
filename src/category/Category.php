@@ -7,10 +7,10 @@ class Category {
 
     private string $name;
 
-    private bool $active;
+    private int $active;
 
 
-    public function __construct(int $id, string $name, bool $active) {
+    public function __construct(int $id, string $name, int $active) {
         $this->id = $id;
         $this->name = $name;
         $this->active = $active;
@@ -36,12 +36,12 @@ class Category {
         $this->name = $name;
     }
 
-    public function isActive(): bool
+    public function isActive(): int
     {
         return $this->active;
     }
 
-    public function setActive(bool $active): void
+    public function setActive(int $active): void
     {
         $this->active = $active;
     }

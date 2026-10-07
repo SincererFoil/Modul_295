@@ -42,7 +42,6 @@ class Routes {
         $app->delete('/unauthenticate', [$authController, 'unAuthenticate'])
             ->addMiddleware($middleware);
 
-
         // Category Routes
 
         // GET (Categories) Route

@@ -58,7 +58,7 @@ class CategoryService {
             // Returns the new created category
             return ["id" => $category->getId(), "name" => $category->getName(), "active" => $category->isActive()];
         } catch (\Throwable $exception) {
-            return ["fatal error" => "An unexpected error occurred"];
+            return ["fatal_error" => "An unexpected error occurred"];
         }
 
 
@@ -76,7 +76,7 @@ class CategoryService {
             return $categories;
             // If anything goes wrong (Database crash, etc.) it will return a fatal error
         } catch (\Throwable $e) {
-            return ["fatal error" => "an unexpected error occurred"];
+            return ["fatal_error" => "an unexpected error occurred"];
         }
     }
 
@@ -114,7 +114,7 @@ class CategoryService {
         try {
             // Checks if the category exists by id
             if (!$this->categoryRepository->existsById($id)) {
-                return ["error" => "Category does not exist"];
+                return ["not_found" => "Category does not exist"];
             }
 
             // Checks if the category exists by name
@@ -124,7 +124,7 @@ class CategoryService {
             // Executes the update
             $result = $this->categoryRepository->updateCategory($id, $name, $active);
         } catch (\Throwable $exception) {
-            return ["fatal error" => "an unexpected error occurred "];
+            return ["fatal_error" => "an unexpected error occurred "];
         }
         // Returns the final result
         return $result;
@@ -156,13 +156,13 @@ class CategoryService {
         try {
             // Checks if a Category with the id exists
             if (!$this->categoryRepository->existsById($id)) {
-                return ["error" => "Category does not exist"];
+                return ["not_found" => "Category does not exist"];
             }
             // Returns the Category
             return $this->categoryRepository->getCategoryById($id);
         } catch (\Throwable $exception) {
             // In case of an error it throws a 500 - internal server error
-            return ["fatal error" => "an unexpected error occurred"];
+            return ["fatal_error" => "an unexpected error occurred"];
         }
     }
 
@@ -192,13 +192,13 @@ class CategoryService {
         try {
             // Checks if a Category with the id exists
             if (!$this->categoryRepository->existsById($id)) {
-                return ["error" => "Category does not exist"];
+                return ["not_found" => "Category does not exist"];
             }
             $this->categoryRepository->deleteCategory($id);
             return null;
         } catch (\Throwable $exception) {
             // In case of an error it throws a 500 - internal server error
-            return ["fatal error" => "an unexpected error occurred"];
+            return ["fatal_error" => "an unexpected error occurred"];
         }
     }
 

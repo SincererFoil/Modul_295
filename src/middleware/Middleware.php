@@ -49,10 +49,11 @@ class Middleware implements \Psr\Http\Server\MiddlewareInterface
 
     }
 
-    private function sendUnauthorized(Response $response, string $message) : ResponseInterface {
-
-        $response = $response->withStatus(401);
+    private function sendUnauthorized(ResponseInterface $response, string $message) : ResponseInterface
+    {
+        $response = $response->withHeader('Content-Type', 'application/json')->withStatus(401);
         $response->getBody()->write(json_encode(["error" => $message]));
+
         return $response;
     }
 
