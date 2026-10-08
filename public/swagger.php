@@ -5,10 +5,12 @@ require __DIR__ . "/../vendor/autoload.php";
 $scripts = glob(__DIR__ . "/../src/*.php");
 $controller = glob(__DIR__ . "/../src/controller/*.php");
 
+// Requires all php files in src/
 foreach ($scripts as $script) {
     require $script;
 }
 
+// Requires all Controller
 foreach ($controller as $script) {
     require $script;
 }

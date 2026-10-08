@@ -1,7 +1,7 @@
 <?php
 namespace App\database\repository;
 
-use App\category\Category;
+use App\database\Database;
 use App\product\Product;
 use mysqli;
 
@@ -11,10 +11,10 @@ class ProductRepository {
 
     /**
      *  Initializes the Database Connection
-     * @param $connection database Connection
+     * @param Database $database database Connection
      */
-    public function __construct($connection) {
-        $this->connection = $connection;
+    public function __construct(Database $database) {
+        $this->connection = $database->getConnection();
     }
 
 
@@ -24,7 +24,7 @@ class ProductRepository {
      * @return array returns all Products in a array
      */
     public function getAll(): array {
-        $stmt = $this->connection->prepare("SELECT * FROM products");
+        $stmt = $this->connection->prepare("SELECT * FROM product");
         $stmt->execute();
         $result = $stmt->get_result();
         return $result->fetch_all(MYSQLI_ASSOC);
@@ -39,7 +39,7 @@ class ProductRepository {
      *              returns false if the product dosn't exists
      */
     public function productExists(string $sku): bool {
-        $stmt = $this->connection->prepare("SELECT * FROM products WHERE sku = ?");
+        $stmt = $this->connection->prepare("SELECT * FROM product WHERE sku = ?");
         $stmt->execute([$sku]);
         $result = $stmt->get_result();
         return $result->num_rows > 0;
@@ -53,7 +53,7 @@ class ProductRepository {
      * @return array the final Select result with the data
      */
     public function getProductBySku(string $sku) : array {
-        $stmt = $this->connection->prepare("SELECT * FROM products WHERE sku = ?");
+        $stmt = $this->connection->prepare("SELECT * FROM product WHERE sku = ?");
         $stmt->execute([$sku]);
         $result = $stmt->get_result();
         return $result->fetch_all(MYSQLI_ASSOC);
@@ -69,9 +69,7 @@ class ProductRepository {
     public function createProduct(Product $product): array
     {
         $stmt = $this->connection->prepare(
-            "INSERT INTO products
-        (sku, active, id_category, name, image, description, price, stock)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+            "INSERT INTO product(sku, active, id_category, name, image, description, price, stock) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
         );
 
         $stmt->execute([
@@ -102,12 +100,12 @@ class ProductRepository {
     /**
      *  Updates an existing product in the Database
      *
-     * @param Product $product the products new values
+     * @param Product $product the product new values
      * @return array returns a array with the new product informations
      */
     public function updateProduct(Product $product): array {
         $stmt = $this->connection->prepare(
-            "UPDATE products SET  active = ?, id_category = ?,
+            "UPDATE product SET  active = ?, id_category = ?,
                 name = ?, image = ?, description = ?, price = ?, stock = ? WHERE sku = ?");
 
         $stmt->execute([
@@ -121,8 +119,16 @@ class ProductRepository {
             $product->getSku()
         ]);
 
+        try {
+            // Gets the product id from the sku
+            $id = $this->getProductIdBySku($product->getSku());
+        } catch (\Throwable $exception) {
+            $id = null;
+        }
+
+        // Returns the New updated verion of the product
         return [
-            "id" => null,
+            "id" => $id,
             "sku" => $product->getSku(),
             "active" => $product->isActive(),
             "id_category" => $product->getCategoryId(),
@@ -142,9 +148,24 @@ class ProductRepository {
      * @return bool returns true if the statement was successful
      */
     public function deleteProduct(string $sku): bool {
-        $stmt = $this->connection->prepare("DELETE FROM products WHERE sku = ?");
+        $stmt = $this->connection->prepare("DELETE FROM product WHERE sku = ?");
         $stmt->execute([$sku]);
         return $stmt->affected_rows > 0;
+
+    }
+
+    /**
+     * Returns a product id from a prodict sku
+     *
+     * @param string $sku the prooducts sku
+     * @return int|null the products id
+     */
+    public function getProductIdBySku(string $sku): int|null {
+        $stmt = $this->connection->prepare("SELECT product_id FROM product WHERE sku = ?");
+        $stmt->execute([$sku]);
+        $result = $stmt->get_result()->fetch_assoc();
+
+        return $result !== null ? (int) $result["product_id"] : null;
 
     }
 

@@ -2,15 +2,16 @@
 
 namespace App\product;
 
+
 class Product {
 
-    private int $id;
+    private int|null $id;
 
     private string $name;
 
     private string $sku;
 
-    private bool $active;
+    private int $active;
 
     private int $categoryId;
 
@@ -18,22 +19,25 @@ class Product {
 
     private string $description;
 
-    private int $price;
+    private float $price;
 
     private int $stock;
 
     /**
-     * @param int $id
-     * @param string $name
-     * @param string $sku
-     * @param bool $active
-     * @param int $categoryId
-     * @param string $imageUrl
-     * @param string $description
-     * @param int $price
-     * @param int $stock
+     *  This is a Product Object,
+     *  It Represents the Product from the Database
+     *
+     * @param int|null $id The unique ID of the product
+     * @param string $name the Name of the product
+     * @param string $sku the unique identifier sku of the product
+     * @param int $active the active (1 or 0) of the product
+     * @param int $categoryId the category id where the product is located
+     * @param string $imageUrl an image of the product as a url
+     * @param string $description a text to describe the product
+     * @param float $price a price of the product
+     * @param int $stock the stock amount of the product
      */
-    public function __construct(int $id, string $name, string $sku, bool $active, int $categoryId, string $imageUrl, string $description, int $price, int $stock)
+    public function __construct(int|null $id, string $name, string $sku, int $active, int $categoryId, string $imageUrl, string $description, float $price, int $stock)
     {
         $this->id = $id;
         $this->name = $name;
@@ -47,23 +51,23 @@ class Product {
     }
 
     /**
-     * @return int
+     * @return int|null the id
      */
-    public function getId(): int
+    public function getId(): int|null
     {
         return $this->id;
     }
 
     /**
-     * @param int $id
+     * @param int|null $id the id
      */
-    public function setId(int $id): void
+    public function setId(int|null $id): void
     {
         $this->id = $id;
     }
 
     /**
-     * @return string
+     * @return string the name
      */
     public function getName(): string
     {
@@ -71,7 +75,7 @@ class Product {
     }
 
     /**
-     * @param string $name
+     * @param string $name the name
      */
     public function setName(string $name): void
     {
@@ -79,7 +83,7 @@ class Product {
     }
 
     /**
-     * @return string
+     * @return string the unique sku
      */
     public function getSku(): string
     {
@@ -87,7 +91,7 @@ class Product {
     }
 
     /**
-     * @param string $sku
+     * @param string $sku the unique sku
      */
     public function setSku(string $sku): void
     {
@@ -95,23 +99,23 @@ class Product {
     }
 
     /**
-     * @return bool
+     * @return int the active value
      */
-    public function isActive(): bool
+    public function isActive(): int
     {
         return $this->active;
     }
 
     /**
-     * @param bool $active
+     * @param int $active active value
      */
-    public function setActive(bool $active): void
+    public function setActive(int $active): void
     {
         $this->active = $active;
     }
 
     /**
-     * @return int
+     * @return int the category id
      */
     public function getCategoryId(): int
     {
@@ -119,7 +123,7 @@ class Product {
     }
 
     /**
-     * @param int $categoryId
+     * @param int $categoryId the category id
      */
     public function setCategoryId(int $categoryId): void
     {
@@ -127,7 +131,7 @@ class Product {
     }
 
     /**
-     * @return string
+     * @return string the image url
      */
     public function getImageUrl(): string
     {
@@ -135,7 +139,7 @@ class Product {
     }
 
     /**
-     * @param string $imageUrl
+     * @param string $imageUrl the image url
      */
     public function setImageUrl(string $imageUrl): void
     {
@@ -143,7 +147,7 @@ class Product {
     }
 
     /**
-     * @return string
+     * @return string the description
      */
     public function getDescription(): string
     {
@@ -151,7 +155,7 @@ class Product {
     }
 
     /**
-     * @param string $description
+     * @param string $description the description
      */
     public function setDescription(string $description): void
     {
@@ -159,23 +163,23 @@ class Product {
     }
 
     /**
-     * @return int
+     * @return float the description
      */
-    public function getPrice(): int
+    public function getPrice(): float
     {
         return $this->price;
     }
 
     /**
-     * @param int $price
+     * @param float $price the description
      */
-    public function setPrice(int $price): void
+    public function setPrice(float $price): void
     {
         $this->price = $price;
     }
 
     /**
-     * @return int
+     * @return int the stock amount
      */
     public function getStock(): int
     {
@@ -183,7 +187,7 @@ class Product {
     }
 
     /**
-     * @param int $stock
+     * @param int $stock the stock amount
      */
     public function setStock(int $stock): void
     {

@@ -1,13 +1,14 @@
 <?php
 namespace App\database\repository;
 
+use App\database\Database;
 use mysqli;
 use App\category\Category;
 
 class CategoryRepository {
     private mysqli $connection;
 
-    public function __construct($database) {
+    public function __construct(Database $database) {
         $this->connection = $database->getConnection();
     }
 
