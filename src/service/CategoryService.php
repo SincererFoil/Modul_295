@@ -46,10 +46,15 @@ class CategoryService {
             return ["error" => "Invalid value, active must be 0 or 1"];
         }
 
+        if (trim($array['name']) === "") {
+            return ["error" => "Missing required parameter 'name'"];
+        }
+
         // Checks if the name is greater than 500 letters
         if (strlen($array['name']) > 500) {
             return ["error" => "Category name is too long"];
         }
+
 
         try {
             // Checks if the Category name already exists
@@ -103,6 +108,14 @@ class CategoryService {
             return ["error" => "Wrong parameter type 'id' or 'name' or 'active'"];
         }
 
+        if (trim($name) === "") {
+            return ["error" => "Missing required parameter 'name'"];
+        }
+
+        // Checks if the id is a whole number
+        if (!ctype_digit($id)) {
+            return ["error" => "Wrong parameter 'id'"];
+        }
         // Converts the category_id path parameter from a string to an integer
         $id = (int) $id;
 
@@ -154,6 +167,11 @@ class CategoryService {
             return ["error" => "Wrong parameter type 'category_id'"];
         }
 
+        // Checks if the id is a whole number
+        if (!ctype_digit($id)) {
+            return ["error" => "Wrong parameter 'id'"];
+        }
+
         // Converts the category_id path parameter from a string to an integer
         $id = (int) $id;
 
@@ -188,6 +206,11 @@ class CategoryService {
         // Checks if the $id is a number
         if (!is_numeric($id)) {
             return ["error" => "Wrong parameter type 'category_id'"];
+        }
+
+        // Checks if the id is a whole number
+        if (!ctype_digit($id)) {
+            return ["error" => "Wrong parameter 'id'"];
         }
 
         // Converts the category_id path parameter from a string to an integer
