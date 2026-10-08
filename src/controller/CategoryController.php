@@ -222,7 +222,7 @@ class CategoryController {
     )]
 
 
-    public function getCategoriesRequest(ServerRequestInterface  $request, ResponseInterface $response, array $args): ResponseInterface {
+    public function getCategories(ServerRequestInterface  $request, ResponseInterface $response, array $args): ResponseInterface {
 
         // Calls the getAllCategories method from the Category Repository
         // and saves the response in the variable $categories
@@ -627,6 +627,19 @@ class CategoryController {
                 )
             ),
             new OAT\Response(
+                response: 409,
+                description: 'Es existieren noch Produkte mit dieser Kategorie',
+                content: new OAT\JsonContent(
+                    properties: [
+                        new OAT\Property(
+                            property: 'conflict',
+                            type: 'string',
+                            example: "Category is still used by products"
+                        )
+                    ]
+                )
+            ),
+            new OAT\Response(
                 response: 500,
                 description: 'Unbekannter Serverfehler',
                 content: new OAT\JsonContent(
@@ -664,6 +677,13 @@ class CategoryController {
         if (isset($result["fatal_error"])) {
             // Sets the status code to 500 = Internal Server Error
             $code = 500;
+            $exception = true;
+        }
+
+        // Checks if the results contains a conflict
+        if (isset($result["conflict"])) {
+            // Sets the response code to 409 = Conflict
+            $code = 409;
             $exception = true;
         }
 

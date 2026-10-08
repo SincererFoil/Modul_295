@@ -79,6 +79,13 @@ class ProductService {
         if (!is_string($body["image"]) || trim($body["image"]) === "") {
             return ["error" => "Invalid image"];
         }
+        // Casts the image url to a string
+        $image = (string) $body["image"];
+
+        // Checks if the Image url is not greater than 1000 characters
+        if (strlen($image) > 1000) {
+            return ["error" => "Image URL must not exceed 1000 characters"];
+        }
 
         if (!is_string($body["description"]) || trim($body["description"]) === "") {
             return ["error" => "Invalid description"];
@@ -94,11 +101,11 @@ class ProductService {
             return ["error" => "Invalid price"];
         }
 
-        if (!is_int($body["id_category"])) {
+        if ($body["id_category"] !== null && !is_int($body["id_category"])) {
             return ["error" => "Invalid category"];
         }
 
-        $categoryId = (int) $body["id_category"];
+        $categoryId = $body["id_category"];
 
         $sku = $args['sku'] ?? null;
 
@@ -106,6 +113,23 @@ class ProductService {
         if (!is_string($sku) || trim($sku) === "") {
             return ["error" => "Invalid SKU"];
         }
+
+        if (strlen($sku) > 100) {
+            return ["error" => "SKU must have less than 100 characters"];
+        }
+
+        if (strlen($body["name"]) > 500) {
+            return ["error" => "Name must have less than 500 characters"];
+        }
+
+        $price = (string) $body["price"];
+
+        // Validates that the price is numeric not negative and has at most 2 decimal places
+        if (!is_numeric($price) || $price < 0 || strlen($price) > 66 || round((float)$price, 2) != (float)$price) {
+            return ["error" => "Invalid price"];
+        }
+
+
 
         // Creates a new Product object with the values
         $product = new Product(
@@ -121,9 +145,11 @@ class ProductService {
             );
 
         try {
-            // Checks if the category id exists
-            if (!$this->categoryRepository->existsById($categoryId)) {
-                return ["not_found" => "Category not found"];
+            if ($categoryId !== null) {
+                // Checks if the category id exists
+                if (!$this->categoryRepository->existsById($categoryId)) {
+                    return ["not_found" => "Category not found"];
+                }
             }
              // Checks if the product exists
             if ($this->productRepository->productExists($sku)) {
@@ -142,8 +168,82 @@ class ProductService {
             return ["fatal_error" => "an unexpected error occurred"];
         }
 
+    }
 
 
+    /**
+     *  Deletes an Existing product from the Database
+     *
+     * @param array $args the parameters
+     * @return array The result of the request
+     */
+    public function deleteProduct(array $args): array {
+        // if the arg value from 'sku' not exists (invalid array key) then it sets $sku to null
+        $sku = $args['sku'] ?? null;
+
+        // Checks if the sku is a string and isn't empty
+        if (!is_string($sku) || trim($sku) === "") {
+            return ["error" => "Invalid SKU"];
+        }
+
+        try {
+            // Checks if a product with the sku exists
+            if (!$this->productRepository->productExists($sku)) {
+                return ["not_found" => "Product sku not found"];
+            }
+
+            // Tries to delete the product
+            if ($this->productRepository->deleteProduct($sku)) {
+                return ["deleted" => true];
+            }
+            // If the product couldn't be deleted it will return an error
+            return ["not_found" => "Product could not be deleted"];
+        } catch (\Throwable $ex) {
+            // If an unexpected exception happened it will return a 500 = Internal Server Error
+            return ["fatal_error" => "an unexpected error occurred"];
+        }
+
+    }
+
+    /**
+     *  Gets all Products from the database
+     *
+     * @return array The final result
+     */
+    public function listProducts(): array {
+        try {
+            // Returns the result
+            return $this->productRepository->getAll();
+        } catch (\Throwable $ex) {
+
+            // In case of an error it throws a 500 = Internal Server Error
+            return ["fatal_error" => "an unexpected error occurred"];
+        }
+    }
+
+    public function getProduct(array $args): array {
+        // Saves the value of the parameter sku in $sku
+        // if the value does not exist it sets $sku to null
+        $sku = $args['sku'] ?? null;
+
+        // Checks if sku is a string not empty
+        if (!is_string($sku) || trim($sku) === "") {
+            // Returns an error
+            return ["error" => "Invalid SKU"];
+        }
+
+        try {
+            // Checks if the product doesn't exist
+            if (!$this->productRepository->productExists($sku)) {
+                // Returns a 404 = Not Found
+                return ["not_found" => "Product not found"];
+            }
+            // Returns the Product
+            return $this->productRepository->getProductBySku($sku);
+        } catch (\Throwable $ex) {
+            // In case of an error it Throws a 500 = Internal Server Error
+            return ["fatal_error" => "an unexpected error occurred"];
+        }
     }
 
 }

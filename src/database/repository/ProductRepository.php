@@ -169,4 +169,18 @@ class ProductRepository {
 
     }
 
+    /**
+     *  Checks if a product exists with a specific category id,
+     *  This method is used to cancel Category deletions if they still have Products
+     *
+     * @param int $categoryId the category id
+     * @return bool if a product exists with the category id
+     */
+    public function productExistWithCategoryId(int $categoryId): bool {
+        $stmt = $this->connection->prepare("SELECT * FROM product WHERE id_category = ?");
+        $stmt->execute([$categoryId]);
+        $result = $stmt->get_result();
+        return $result->num_rows > 0;
+    }
+
 }

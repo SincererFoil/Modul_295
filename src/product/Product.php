@@ -13,7 +13,7 @@ class Product {
 
     private int $active;
 
-    private int $categoryId;
+    private int|null $categoryId;
 
     private string $imageUrl;
 
@@ -31,13 +31,13 @@ class Product {
      * @param string $name the Name of the product
      * @param string $sku the unique identifier sku of the product
      * @param int $active the active (1 or 0) of the product
-     * @param int $categoryId the category id where the product is located
+     * @param int|null $categoryId the category id where the product is located
      * @param string $imageUrl an image of the product as a url
      * @param string $description a text to describe the product
      * @param float $price a price of the product
      * @param int $stock the stock amount of the product
      */
-    public function __construct(int|null $id, string $name, string $sku, int $active, int $categoryId, string $imageUrl, string $description, float $price, int $stock)
+    public function __construct(int|null $id, string $name, string $sku, int $active, int|null $categoryId, string $imageUrl, string $description, float $price, int $stock)
     {
         $this->id = $id;
         $this->name = $name;
@@ -115,17 +115,17 @@ class Product {
     }
 
     /**
-     * @return int the category id
+     * @return int|null the category id
      */
-    public function getCategoryId(): int
+    public function getCategoryId(): int|null
     {
         return $this->categoryId;
     }
 
     /**
-     * @param int $categoryId the category id
+     * @param int|null $categoryId the category id
      */
-    public function setCategoryId(int $categoryId): void
+    public function setCategoryId(int|null $categoryId): void
     {
         $this->categoryId = $categoryId;
     }

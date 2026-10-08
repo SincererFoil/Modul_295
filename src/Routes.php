@@ -36,7 +36,7 @@ class Routes {
 
         $productRepository = new ProductRepository($database);
 
-        $categoryService = new CategoryService($categoryRepository);
+        $categoryService = new CategoryService($categoryRepository, $productRepository);
 
         $productService = new ProductService($productRepository, $categoryRepository);
 
@@ -61,8 +61,9 @@ class Routes {
 
         // Category Routes
 
+
         // GET (Categories) Route
-        $app->get("/categories", [$categoryController, 'getCategoriesRequest'])
+        $app->get("/categories", [$categoryController, 'getCategories'])
             ->addMiddleware($middleware);
 
         // GET (Category) Route
@@ -86,7 +87,19 @@ class Routes {
 
 
         // PUT (product) Route
-        $app->put('/product/{sku}', [$productController, 'putProductRequest'])
+        $app->put('/product/{sku}', [$productController, 'putProduct'])
+            ->addMiddleware($middleware);
+
+        // DEL (Product) Route
+        $app->delete('/product/{sku}', [$productController, 'deleteProduct'])
+            ->addMiddleware($middleware);
+
+        // GET (Product) Route
+        $app->get('/product/{sku}', [$productController, 'getProduct'])
+            ->addMiddleware($middleware);
+
+        // GET (products) Route
+        $app->get('/products', [$productController, 'listProducts'])
             ->addMiddleware($middleware);
 
     }

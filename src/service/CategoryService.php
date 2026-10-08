@@ -2,14 +2,18 @@
 namespace App\service;
 
 use App\database\repository\CategoryRepository;
+use App\database\repository\ProductRepository;
 use Psr\Http\Message\ServerRequestInterface;
 
 class CategoryService {
 
     private CategoryRepository $categoryRepository;
 
-    public function __construct(CategoryRepository $categoryRepository) {
+    private ProductRepository $productRepository;
+
+    public function __construct(CategoryRepository $categoryRepository, ProductRepository $productRepository) {
         $this->categoryRepository = $categoryRepository;
+        $this->productRepository = $productRepository;
     }
 
     /**
@@ -193,6 +197,10 @@ class CategoryService {
             // Checks if a Category with the id exists
             if (!$this->categoryRepository->existsById($id)) {
                 return ["not_found" => "Category does not exist"];
+            }
+            // Checks if products still use the category id
+            if ($this->productRepository->productExistWithCategoryId($id)) {
+                return ["conflict" => "Category is still used by products"];
             }
             $this->categoryRepository->deleteCategory($id);
             return null;
