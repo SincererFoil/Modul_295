@@ -56,7 +56,7 @@ class ProductRepository {
         $stmt = $this->connection->prepare("SELECT * FROM product WHERE sku = ?");
         $stmt->execute([$sku]);
         $result = $stmt->get_result();
-        return $result->fetch_all(MYSQLI_ASSOC);
+        return $result->fetch_assoc();
     }
 
 

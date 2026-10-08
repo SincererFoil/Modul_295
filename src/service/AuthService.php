@@ -29,11 +29,17 @@ class AuthService {
      *  Handles a Login request
      * It validates the Input and returns an array with the result
      *
-     * @param string $username
-     * @param string $password
      * @return array The final result containing an error or the generated token
      */
-    public function loginRequest(string $username, string $password): array {
+    public function loginRequest($username, $password): array {
+        // Checks if username and passwords are strings
+        if (!is_string($username) || !is_string($password)) {
+            return ["error" => "Wrong parameter type for 'username' or 'password'"];
+        }
+        // Checks that username and password aren't empty
+        if ($username === "" || $password === "") {
+            return ["error" => "Wrong parameter type for 'username' or 'password'"];
+        }
 
         // Checks if the Username and Password are correct
         if ($this->password === $password && $this->username === $username) {
