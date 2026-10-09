@@ -17,7 +17,7 @@ class JwtService {
      */
     public function __construct() {
         // Sets the JWT secret to the value of the environment variable
-        $this->jwtSecret = getenv('JWT_SECRET');
+        $this->jwtSecret = getenv('JWT_SECRET') ?: "TestJwtSecret_IamATestQ4vN8bR3tY6wL1zH5cD0sA";
     }
 
     /**

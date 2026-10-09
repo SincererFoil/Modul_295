@@ -56,7 +56,7 @@ class AuthController {
         ),
         responses: [
             new OAT\Response(
-                response: 200,
+                response: 204,
                 description: 'Cookie wurde erstellt',
             ),
             new OAT\Response(
@@ -111,7 +111,7 @@ class AuthController {
         }
         // Sets the token as a cookie
         setcookie("token", $loginresponse["token"]);
-        $response = $response->withStatus(200)->withHeader('Content-Type', 'application/json');
+        $response = $response->withStatus(204)->withHeader('Content-Type', 'application/json');
         return $response;
     }
 

@@ -13,7 +13,12 @@ class Database {
      */
     public function __construct() {
         try {
-            $this->connection = new mysqli(getenv("DB_HOST"), getenv("DB_USERNAME"), getenv("DB_PASSWORD"), getenv("DB_DATABASE"), getenv("DB_PORT"));
+            $this->connection = new mysqli(
+                getenv("DB_HOST") ?: "localhost",
+                getenv("DB_USERNAME") ?: "root",
+                getenv("DB_PASSWORD") ?: '',
+                getenv("DB_DATABASE") ?: 'uek295',
+                getenv("DB_PORT")) ?: '3306';
             // Checks if an error happened during the connection
             if ($this->connection->connect_error) {
                 throw new mysqli_sql_exception("Couldn't connect to database");
