@@ -12,7 +12,7 @@ XAMPP Installation:
 
 
 
-3 .C:\\xampp\\apache\\conf :
+3 .C:\\xampp\\apache\\conf\\httpd.conf :
 
 
 
