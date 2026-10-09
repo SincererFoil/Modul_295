@@ -26,6 +26,6 @@ try {
     header('Content-Type: application/json');
     // Sends fallback message
     echo json_encode([
-        'fatal_error' => 'an unexpected error occurred' . $e->getMessage()
+        'fatal_error' => 'an unexpected error occurred'
     ]);
 }
